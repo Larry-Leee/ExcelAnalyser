@@ -1,64 +1,39 @@
-name: Build Python App for Windows and macOS
+name: Build and Deploy
 
 on:
   push:
     branches:
-      - test  # 每当推送到main分支时触发构建
+      - test  # 触发构建的分支
+  pull_request:
+    branches:
+      - test  # 触发构建的分支
 
 jobs:
-  build_windows:
-    runs-on: windows-latest  # Windows 环境
+  build:
+    runs-on: windows-latest  # 使用 Windows 环境构建 .exe 文件
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3  # 克隆你的仓库
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'  # 可根据需要修改Python版本
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'  # 你使用的 Python 版本，可以修改为适合你的版本
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller streamlit pandas plotly
-          pip install pandas
-          pip install numpy
-          pip install -r requirements.txt
-          pip install pyinstaller  # 安装 PyInstaller
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt  # 安装 requirements.txt 中列出的依赖，包括 streamlit
 
-      - name: Build Windows executable
-        run: |
-          pyinstaller --onefile main.py  # 替换为你自己的脚本名
+    - name: Install PyInstaller
+      run: pip install pyinstaller  # 安装 PyInstaller
 
-      - name: Upload Windows executable
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-build
-          path: dist/main.exe  # 生成的Windows可执行文件路径
+    - name: Build .exe using PyInstaller
+      run: pyinstaller --onefile --hidden-import=streamlit main.py  # 打包你的 Python 脚本为 .exe 文件
 
-  build_mac:
-    runs-on: macos-latest  # macOS 环境
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller  # 安装 PyInstaller
-
-      - name: Build macOS executable
-        run: |
-          pyinstaller --onefile main.py  
-
-      - name: Upload macOS executable
-        uses: actions/upload-artifact@v4
-        with:
-          name: mac-build
-          path: dist/main  # 生成的macOS可执行文件路径
+    - name: Upload .exe as artifact
+      uses: actions/upload-artifact@v4  # 将 .exe 文件上传为 artifact
+      with:
+        name: built-exe
+        path: dist/main.exe  # 你的 .exe 文件路径
