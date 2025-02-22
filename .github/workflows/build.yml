@@ -3,37 +3,73 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - test  # 触发构建的分支
+      - test
   pull_request:
     branches:
-      - test  # 触发构建的分支
+      - test
 
 jobs:
   build:
-    runs-on: windows-latest  # 使用 Windows 环境构建 .exe 文件
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3  # 克隆你的仓库
+      uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.8'  # 你使用的 Python 版本，可以修改为适合你的版本
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt  # 安装 requirements.txt 中列出的依赖，包括 streamlit
+        pip install streamlit==1.29.0 pandas==2.1.4 plotly==5.18.0 numpy==1.24.3 openpyxl==3.1.2 pyinstaller
 
-    - name: Install PyInstaller
-      run: pip install pyinstaller  # 安装 PyInstaller
+    - name: Create Streamlit config
+      run: |
+        mkdir .streamlit
+        echo '[server]
+        enableCORS = true
+        enableXsrfProtection = true
+        
+        [browser]
+        serverAddress = "localhost"
+        serverPort = 8501
+        gatherUsageStats = false
+        
+        [theme]
+        primaryColor = "#F63366"
+        backgroundColor = "#FFFFFF"
+        secondaryBackgroundColor = "#F0F2F6"
+        textColor = "#262730"
+        font = "sans serif"' > .streamlit/config.toml
 
-    - name: Build .exe using PyInstaller
-      run: pyinstaller --onefile --hidden-import=streamlit --add-data ".streamlit;./.streamlit" --debug=all main.py  # 打包你的 Python 脚本为 .exe 文件
+    - name: Build executable
+      run: |
+        pyinstaller --name="ExcelAnalyser" `
+          --onefile `
+          --add-data ".streamlit;.streamlit" `
+          --hidden-import=streamlit `
+          --hidden-import=streamlit.runtime.scriptrunner `
+          --hidden-import=streamlit.runtime.runtime `
+          --hidden-import=streamlit.runtime.caching `
+          --hidden-import=streamlit.runtime.metrics `
+          --hidden-import=streamlit.runtime.secrets `
+          --hidden-import=plotly `
+          --hidden-import=numpy `
+          --hidden-import=pandas `
+          --collect-all streamlit `
+          --collect-all plotly `
+          main.py
 
-    - name: Upload .exe as artifact
-      uses: actions/upload-artifact@v4  # 将 .exe 文件上传为 artifact
+    - name: List build output
+      run: dir dist
+      shell: cmd
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
       with:
-        name: built-exe
-        path: dist/main.exe  # 你的 .exe 文件路径
+        name: ExcelAnalyser
+        path: dist/ExcelAnalyser.exe
+        if-no-files-found: error
