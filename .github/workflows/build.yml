@@ -38,4 +38,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Excel分析器
-        path: dist/Excel分析器.exe
+        path: dist/Excel.exe
