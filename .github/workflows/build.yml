@@ -3,7 +3,7 @@ name: Build Python App for Windows and macOS
 on:
   push:
     branches:
-      - main  # 每当推送到main分支时触发构建
+      - test  # 每当推送到main分支时触发构建
 
 jobs:
   build_windows:
