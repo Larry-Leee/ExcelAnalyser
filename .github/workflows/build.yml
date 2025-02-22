@@ -1,0 +1,64 @@
+name: Build Python App for Windows and macOS
+
+on:
+  push:
+    branches:
+      - test  # 你也可以根据需求修改为其他分支
+  pull_request:
+    branches:
+      - test
+
+jobs:
+  build_windows:
+    runs-on: windows-latest  # Windows 环境
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'  # 你可以根据需要更改 Python 版本
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller  # 安装 PyInstaller
+
+      - name: Build Windows executable
+        run: |
+          pyinstaller --onefile your_script.py  # 你自己的脚本名
+
+      - name: Upload Windows executable
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-build
+          path: dist/your_script.exe
+
+  build_mac:
+    runs-on: macos-latest  # macOS 环境
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller  # 安装 PyInstaller
+
+      - name: Build macOS executable
+        run: |
+          pyinstaller --onefile your_script.py  # 你自己的脚本名
+
+      - name: Upload macOS executable
+        uses: actions/upload-artifact@v2
+        with:
+          name: mac-build
+          path: dist/your_script
