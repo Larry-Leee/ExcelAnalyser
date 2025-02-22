@@ -31,7 +31,7 @@ jobs:
           pyinstaller --onefile your_script.py  # 你自己的脚本名
 
       - name: Upload Windows executable
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: windows-build
           path: dist/your_script.exe
@@ -40,12 +40,12 @@ jobs:
     runs-on: macos-latest  # macOS 环境
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: '3.9'
+          python-version: '3.8'
 
       - name: Install dependencies
         run: |
@@ -58,7 +58,7 @@ jobs:
           pyinstaller --onefile your_script.py  # 你自己的脚本名
 
       - name: Upload macOS executable
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: mac-build
           path: dist/your_script
