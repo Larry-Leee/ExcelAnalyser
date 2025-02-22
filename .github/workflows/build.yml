@@ -51,15 +51,19 @@ jobs:
 
         def run_streamlit():
             try:
+                # 检查端口是否被占用
                 if is_port_in_use(8501):
+                    print("端口 8501 已被占用，请关闭其他 Streamlit 应用后重试")
                     return None
                 
+                # 获取应用路径
                 if getattr(sys, "frozen", False):
                     app_dir = os.path.dirname(sys.executable)
                     script_path = os.path.join(app_dir, "main.py")
                 else:
                     script_path = "main.py"
                 
+                # 启动 Streamlit
                 cmd = [
                     sys.executable,
                     "-m", "streamlit",
@@ -72,6 +76,7 @@ jobs:
                     "--server.runOnSave=false"
                 ]
                 
+                # 启动进程，不显示命令行窗口
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                 startupinfo.wShowWindow = subprocess.SW_HIDE
@@ -84,8 +89,13 @@ jobs:
                     creationflags=subprocess.CREATE_NO_WINDOW
                 )
                 
+                # 等待服务启动
                 time.sleep(3)
-                webbrowser.open("http://localhost:8501", new=2, autoraise=True)
+                
+                # 只打开一次浏览器
+                if process.poll() is None:  # 确保 Streamlit 进程正在运行
+                    webbrowser.open("http://localhost:8501", new=2, autoraise=True)
+                
                 return process
                 
             except Exception as e:
@@ -143,7 +153,7 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --name="test" `
+        pyinstaller --name="analysis" `
           --onefile `
           --add-data "main.py;." `
           --add-data ".streamlit/config.toml;.streamlit" `
@@ -163,6 +173,6 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: test
-        path: dist/test.exe
+        name: analysis
+        path: dist/analysis.exe
         if-no-files-found: error
