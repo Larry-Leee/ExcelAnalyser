@@ -31,6 +31,30 @@ jobs:
         pip install openpyxl==3.1.2
         pip install pyinstaller
 
+    # 首先创建 .streamlit 目录和配置
+    - name: Create Streamlit config
+      run: |
+        mkdir .streamlit
+        echo '[server]
+        enableCORS = true
+        enableXsrfProtection = true
+        headless = true
+        address = "localhost"
+        port = 8501
+        
+        [browser]
+        serverAddress = "localhost"
+        serverPort = 8501
+        gatherUsageStats = false
+        
+        [theme]
+        primaryColor = "#F63366"
+        backgroundColor = "#FFFFFF"
+        secondaryBackgroundColor = "#F0F2F6"
+        textColor = "#262730"
+        font = "sans serif"' > .streamlit/config.toml
+
+    # 然后创建启动器脚本
     - name: Create launcher script
       run: |
         echo 'import os
@@ -87,12 +111,20 @@ jobs:
                 print(f"运行时错误: {str(e)}")
                 input("发生错误。按回车键退出...")' > launcher.py
 
+    # 检查文件是否创建成功
+    - name: List files
+      run: |
+        dir
+        dir .streamlit
+      shell: cmd
+
+    # 最后构建可执行文件
     - name: Build executable
       run: |
         pyinstaller --name="analysis" `
           --onefile `
           --add-data "main.py;." `
-          --add-data ".streamlit;.streamlit" `
+          --add-data ".streamlit/config.toml;.streamlit" `
           --hidden-import=streamlit `
           --hidden-import=streamlit.runtime.scriptrunner `
           --hidden-import=streamlit.runtime.runtime `
