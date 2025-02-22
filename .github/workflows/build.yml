@@ -28,7 +28,7 @@ jobs:
           pyinstaller --onefile your_script.py  # 替换为你自己的脚本名
 
       - name: Upload Windows executable
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: windows-build
           path: dist/your_script.exe  # 生成的Windows可执行文件路径
