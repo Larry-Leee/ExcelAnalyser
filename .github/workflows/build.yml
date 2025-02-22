@@ -32,7 +32,7 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --name="Excel分析器" --onefile --hidden-import=streamlit --hidden-import=streamlit.runtime.scriptrunner --hidden-import=streamlit.runtime.runtime --hidden-import=streamlit.runtime.caching --hidden-import=streamlit.runtime.metrics --hidden-import=streamlit.runtime.secrets --collect-all streamlit your_app.py
+        pyinstaller --name="Excel分析器" --onefile --hidden-import=streamlit --hidden-import=streamlit.runtime.scriptrunner --hidden-import=streamlit.runtime.runtime --hidden-import=streamlit.runtime.caching --hidden-import=streamlit.runtime.metrics --hidden-import=streamlit.runtime.secrets --collect-all streamlit main.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
