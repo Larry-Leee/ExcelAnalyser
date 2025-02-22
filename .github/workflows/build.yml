@@ -25,7 +25,7 @@ jobs:
 
       - name: Build Windows executable
         run: |
-          pyinstaller --onefile your_script.py  # 替换为你自己的脚本名
+          pyinstaller --onefile main.py  # 替换为你自己的脚本名
 
       - name: Upload Windows executable
         uses: actions/upload-artifact@v4
