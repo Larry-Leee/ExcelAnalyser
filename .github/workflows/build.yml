@@ -1,64 +1,39 @@
-name: Build Python App for Windows and macOS
+name: Build and Upload Artifact
 
 on:
   push:
     branches:
-      - test  # 你也可以根据需求修改为其他分支
-  pull_request:
-    branches:
       - test
 
 jobs:
-  build_windows:
-    runs-on: windows-latest  # Windows 环境
+  build:
+    runs-on: ubuntu-latest
+
     steps:
+      # 检出代码
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 设置 Python 环境
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.9'  # 你可以根据需要更改 Python 版本
+          python-version: '3.x'
 
+      # 安装依赖
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pyinstaller  # 安装 PyInstaller
 
-      - name: Build Windows executable
+      # 运行测试或构建
+      - name: Run build or tests
         run: |
-          pyinstaller --onefile your_script.py  # 你自己的脚本名
+          python your-script.py
 
-      - name: Upload Windows executable
+      # 上传构建产物
+      - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: windows-build
-          path: dist/your_script.exe
-
-  build_mac:
-    runs-on: macos-latest  # macOS 环境
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.8'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller  # 安装 PyInstaller
-
-      - name: Build macOS executable
-        run: |
-          pyinstaller --onefile your_script.py  # 你自己的脚本名
-
-      - name: Upload macOS executable
-        uses: actions/upload-artifact@v3
-        with:
-          name: mac-build
-          path: dist/your_script
+          name: build-artifact
+          path: ./build/
